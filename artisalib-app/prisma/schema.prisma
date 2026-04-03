@@ -1,0 +1,170 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CLIENT
+  ARTISAN
+  ADMIN
+}
+
+enum SubscriptionPlan {
+  BASIC
+  PREMIUM
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  INCOMPLETE
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELED
+  COMPLETED
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  DECLINED
+}
+
+model User {
+  id                String                  @id @default(cuid())
+  firstName         String
+  lastName          String
+  email             String                  @unique
+  passwordHash      String
+  emailVerifiedAt   DateTime?
+  phone             String?
+  role              Role
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+  artisanProfile    ArtisanProfile?
+  clientBookings    Booking[]               @relation("ClientBookings")
+  verificationTokens EmailVerificationToken[]
+  passwordResetTokens PasswordResetToken[]
+  reviews           Review[]                @relation("ReviewAuthor")
+}
+
+model ArtisanProfile {
+  id                    String               @id @default(cuid())
+  userId                String               @unique
+  slug                  String               @unique
+  businessName          String
+  trade                 String
+  city                  String
+  zipCode               String?
+  bio                   String?
+  yearsExperience       Int                  @default(0)
+  hourlyRateCents       Int?
+  fixedRateCents        Int?
+  coordinates           String?
+  visible               Boolean              @default(false)
+  isPremium             Boolean              @default(false)
+  companyName           String?
+  siret                 String?
+  phonePublic           String?
+  website               String?
+  stripeCustomerId      String?
+  stripeSubscriptionId  String?
+  stripePriceId         String?
+  subscriptionPlan      SubscriptionPlan?
+  subscriptionStatus    SubscriptionStatus?
+  trialEndsAt           DateTime?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  user                  User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookings              Booking[]            @relation("ArtisanBookings")
+  quotes                Quote[]
+  reviews               Review[]
+  availabilitySlots     AvailabilitySlot[]
+}
+
+model AvailabilitySlot {
+  id          String           @id @default(cuid())
+  artisanId   String
+  startsAt    DateTime
+  endsAt      DateTime
+  isBooked    Boolean          @default(false)
+  artisan     ArtisanProfile   @relation(fields: [artisanId], references: [id], onDelete: Cascade)
+
+  @@index([artisanId, startsAt])
+}
+
+model Booking {
+  id            String         @id @default(cuid())
+  clientId      String
+  artisanId     String
+  startsAt      DateTime
+  endsAt        DateTime
+  address       String
+  city          String
+  postalCode    String
+  requestNote   String?
+  status        BookingStatus  @default(PENDING)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  client        User           @relation("ClientBookings", fields: [clientId], references: [id], onDelete: Cascade)
+  artisan       ArtisanProfile @relation("ArtisanBookings", fields: [artisanId], references: [id], onDelete: Cascade)
+  quote         Quote?
+  review        Review?
+
+  @@index([artisanId, startsAt])
+  @@index([clientId, startsAt])
+}
+
+model Quote {
+  id          String         @id @default(cuid())
+  bookingId   String         @unique
+  artisanId   String
+  amountCents Int
+  description String
+  status      QuoteStatus    @default(DRAFT)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  booking     Booking        @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  artisan     ArtisanProfile @relation(fields: [artisanId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id          String         @id @default(cuid())
+  bookingId   String         @unique
+  artisanId   String
+  authorId    String
+  rating      Int
+  comment     String
+  createdAt   DateTime       @default(now())
+  booking     Booking        @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  artisan     ArtisanProfile @relation(fields: [artisanId], references: [id], onDelete: Cascade)
+  author      User           @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model EmailVerificationToken {
+  id          String    @id @default(cuid())
+  userId      String
+  token       String    @unique
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id          String    @id @default(cuid())
+  userId      String
+  token       String    @unique
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
