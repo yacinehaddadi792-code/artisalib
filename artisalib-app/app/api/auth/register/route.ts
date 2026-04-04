@@ -6,6 +6,7 @@ import crypto from 'crypto';
 import { sendVerificationEmail } from '@/lib/email';
 
 export async function POST(request: Request) {
+  console.log("REGISTER API CALLED");
   const body = await request.json();
   const parsed = registerSchema.safeParse(body);
 
