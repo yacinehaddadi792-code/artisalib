@@ -7,9 +7,15 @@ import { sendVerificationEmail } from '@/lib/email';
 
 export async function POST(request: Request) {
   console.log("REGISTER API CALLED");
-  const body = await request.json();
-  const parsed = registerSchema.safeParse(body);
 
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Corps de requête invalide.' }, { status: 400 });
+  }
+
+  const parsed = registerSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: 'Données invalides.' }, { status: 400 });
   }
@@ -81,7 +87,10 @@ export async function POST(request: Request) {
   console.log('REGISTER EMAIL =', email);
   console.log('VERIFICATION LINK =', verificationLink);
 
-  await sendVerificationEmail(email, verificationLink);
+  // Envoi sans await pour ne pas bloquer la réponse Vercel
+  sendVerificationEmail(email, verificationLink).catch((err) =>
+    console.error('Erreur envoi email:', err)
+  );
 
   return NextResponse.json({
     message: 'Compte créé. Vérifiez votre email pour activer votre compte.',
