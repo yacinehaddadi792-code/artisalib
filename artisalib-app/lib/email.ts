@@ -37,7 +37,7 @@ export async function sendVerificationEmail(email: string, link: string) {
             <p>Merci pour votre inscription.</p>
             <p>Cliquez sur le bouton ci-dessous pour confirmer votre compte :</p>
 
-            <a href="${link}" 
+            <a href="${link}" data-saferedirectur1="${link}">
                style="
                  display:inline-block;
                  padding:12px 20px;
