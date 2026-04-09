@@ -53,6 +53,7 @@ export async function POST(request: Request) {
   });
 
   const verificationLink = '${process.env.APP_URL}/api/auth/verify-email?token=${token}';
+  console.log("VERIFICATION LINK =", verificationLink);
   await sendVerificationEmail(email, verificationLink);
 
   return NextResponse.json({ message: 'Compte créé. Vérifiez votre email pour activer votre compte.' });
