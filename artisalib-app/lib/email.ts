@@ -15,7 +15,7 @@ export async function sendVerificationEmail(email: string, link: string) {
   const response = await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
     headers: {
-      'X-Mailin-Track': '0'
+      'X-Mailin-Track': '0',
       'Content-Type': 'application/json',
       'api-key': apiKey,
       Accept: 'application/json',
