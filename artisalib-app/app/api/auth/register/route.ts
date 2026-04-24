@@ -52,7 +52,7 @@ export async function POST(request: Request) {
     },
   });
 
-  const verificationLink = '${process.env.APP_URL}/api/auth/verify-email?token=${token}';
+  const verificationLink = `${process.env.APP_URL}/api/auth/verify-email?token=${token}`;
   
   await sendVerificationEmail(email, verificationLink);
 

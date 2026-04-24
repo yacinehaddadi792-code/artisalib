@@ -21,34 +21,29 @@ export async function sendVerificationEmail(email: string, link: string) {
       Accept: 'application/json',
     },
     body: JSON.stringify({
-      sender: {
-        name: 'Artisalib',
-        email: from,
-      },
-      to: [{ email }],
-      subject: 'Confirmez votre compte Artisalib',
-      htmlContent: `
-        <html>
-          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #111;">
-            <h2>Bienvenue sur Artisalib</h2>
-            <p>Merci pour votre inscription.</p>
-            <p>Cliquez sur le bouton ci-dessous pour confirmer votre compte :</p>
-            <p>
-              <a href="${link}" style="display:inline-block;padding:12px 18px;background:#D4900A;color:#fff;text-decoration:none;border-radius:8px;">
-                Confirmer mon compte
-              </a>
-            </p>
-            <p>Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :</p>
-            <p>${link}</p>
-          </body>
-        </html>
-      `,
-      tracking: {
-        clickTracking: false,
-      },
-    }),
-  });
-
+  sender: {
+    name: 'Artisalib',
+    email: from,
+  },
+  to: [{ email }],
+  subject: 'Confirmez votre compte Artisalib',
+  htmlContent: `
+    <html>
+      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #111;">
+        <h2>Bienvenue sur Artisalib</h2>
+        <p>Merci pour votre inscription.</p>
+        <p>Cliquez sur le bouton ci-dessous pour confirmer votre compte :</p>
+        <p>
+          <a href="${link}" style="display:inline-block;padding:12px 18px;background:#D4900A;color:#fff;text-decoration:none;border-radius:8px;">
+            Confirmer mon compte
+          </a>
+        </p>
+        <p>Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :</p>
+        <p>${link}</p>
+      </body>
+    </html>
+  `,
+}),
   if (!response.ok) {
     const errorText = await response.text();
     console.error('Brevo send email error:', errorText);
