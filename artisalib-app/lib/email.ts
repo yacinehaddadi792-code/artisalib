@@ -47,6 +47,6 @@ export async function sendVerificationEmail(email: string, link: string) {
   if (!response.ok) {
   const errorText = await response.text();
   console.error('Brevo send email error:', errorText);
-  return; // ⚠️ NE PAS throw
+  return;
  }
 }
