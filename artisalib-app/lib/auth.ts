@@ -52,6 +52,9 @@ export async function getCurrentUser() {
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
+    include: {
+      artisanProfile: true,
+    },
   })
 
   return user
