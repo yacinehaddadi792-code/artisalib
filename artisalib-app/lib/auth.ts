@@ -1,51 +1,58 @@
-import jwt from 'jsonwebtoken';
-import { cookies } from 'next/headers';
-import { prisma } from './db';
+import CredentialsProvider from "next-auth/providers/credentials"
+import type { NextAuthOptions } from "next-auth"
+import { getServerSession } from "next-auth"
+import { prisma } from "@/lib/db"
+import bcrypt from "bcryptjs"
 
-const COOKIE_NAME = 'artisalib_session';
+export const authOptions: NextAuthOptions = {
+  providers: [
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: {},
+        password: {},
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) return null
 
-type SessionPayload = {
-  userId: string;
-  role: 'CLIENT' | 'ARTISAN' | 'ADMIN';
-};
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        })
 
-export function signSession(payload: SessionPayload) {
-  return jwt.sign(payload, process.env.JWT_SECRET!, { expiresIn: '7d' });
-}
+        if (!user) return null
 
-export async function setSessionCookie(payload: SessionPayload) {
-  const token = signSession(payload);
-  const cookieStore = await cookies();
-  cookieStore.set(COOKIE_NAME, token, {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 7,
-  });
-}
+        const valid = await bcrypt.compare(
+          credentials.password,
+          user.passwordHash
+        )
 
-export async function clearSessionCookie() {
-  const cookieStore = await cookies();
-  cookieStore.set(COOKIE_NAME, '', { path: '/', expires: new Date(0) });
-}
+        if (!valid) return null
 
-export async function getSession() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIE_NAME)?.value;
-  if (!token) return null;
-  try {
-    return jwt.verify(token, process.env.JWT_SECRET!) as SessionPayload;
-  } catch {
-    return null;
-  }
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.firstName,
+        }
+      },
+    }),
+  ],
+  session: {
+    strategy: "jwt",
+  },
+  pages: {
+    signIn: "/login",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
 }
 
 export async function getCurrentUser() {
-  const session = await getSession();
-  if (!session) return null;
-  return prisma.user.findUnique({
-    where: { id: session.userId },
-    include: { artisanProfile: true },
-  });
+  const session = await getServerSession(authOptions)
+
+  if (!session?.user?.email) return null
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+  })
+
+  return user
 }
