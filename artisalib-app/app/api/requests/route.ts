@@ -14,7 +14,9 @@ export async function GET() {
     where: { email: session.user.email },
   })
 
-  if (!user) return NextResponse.json([], { status: 200 })
+  if (!user) {
+    return NextResponse.json([], { status: 200 })
+  }
 
   const requests = await prisma.request.findMany({
     where: { userId: user.id },
@@ -41,10 +43,21 @@ export async function POST(request: Request) {
 
   const body = await request.json()
 
+  if (!body.title || !body.description || !body.trade || !body.city || !body.urgency) {
+    return NextResponse.json(
+      { error: "Tous les champs obligatoires doivent être remplis." },
+      { status: 400 }
+    )
+  }
+
   const newRequest = await prisma.request.create({
     data: {
       title: body.title,
       description: body.description,
+      trade: body.trade,
+      city: body.city,
+      urgency: body.urgency,
+      budget: body.budget || null,
       userId: user.id,
     },
   })
