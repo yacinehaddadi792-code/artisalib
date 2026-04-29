@@ -170,10 +170,15 @@ model PasswordResetToken {
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 model Request {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   title       String
   description String
-  userId      String
-  createdAt   DateTime  @default(now())
-  user        User      @relation(fields: [userId], references: [id])
+  trade       String   @default("Non précisé")
+  city        String   @default("Non précisée")
+  urgency     String   @default("Moyenne")
+  budget      String?
+  createdAt   DateTime @default(now())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id])
 }
