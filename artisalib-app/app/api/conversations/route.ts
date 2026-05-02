@@ -17,7 +17,7 @@ export async function GET() {
 
   if (!user) return NextResponse.json([])
 
-  let conversations = []
+  let conversations: any[] = []
 
   if (user.role === "CLIENT") {
     conversations = await prisma.conversation.findMany({

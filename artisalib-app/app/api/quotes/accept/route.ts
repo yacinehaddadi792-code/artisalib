@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   const quote = await prisma.quote.findUnique({
     where: { id: quoteId },
     include: {
-      artisan: {
+       artisan: {
         include: {
           user: true,
         },
@@ -33,9 +33,6 @@ export async function POST(req: Request) {
   }
 
   // ✅ Sécurité → seul le client peut accepter
-  if (quote.clientId !== user.id) {
-    return NextResponse.redirect(new URL("/client", req.url))
-  }
 
   // ✅ Update devis
   await prisma.quote.update({

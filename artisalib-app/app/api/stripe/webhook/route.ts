@@ -34,7 +34,7 @@ export async function POST(req: Request) {
       await prisma.artisanProfile.update({
         where: { id: artisanId },
         data: {
-          subscriptionPlan: plan,
+          subscriptionPlan: plan as any,
           subscriptionStatus: "ACTIVE",
         },
       })

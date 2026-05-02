@@ -34,7 +34,7 @@ export async function POST(request: Request) {
   const status = artisan.subscriptionStatus || "INACTIVE"
   const isPaid =
     (plan === "BASIC" || plan === "PREMIUM") &&
-    (status === "ACTIVE" || status === "TRIAL")
+    (status === "ACTIVE" || status === "TRIALING")
 
   if (!isPaid) {
     const responseCount = await prisma.requestResponse.count({

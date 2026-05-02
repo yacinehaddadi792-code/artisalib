@@ -71,7 +71,7 @@ export default async function ArtisanDashboard({
 
   const isPaid =
     (plan === 'BASIC' || plan === 'PREMIUM') &&
-    (status === 'ACTIVE' || status === 'TRIAL')
+    (status === 'ACTIVE' || status === 'TRIALING')
 
   const freeLimit = 3
   const remainingResponses = Math.max(0, freeLimit - responseCount)

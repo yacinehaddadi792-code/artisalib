@@ -2,12 +2,13 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/db"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
+
 export async function PATCH(
   request : Request,
-  { params }: { params: { id: string } }
+  context: any 
 ) {
-  const { id } = await params
-
+  const { id } = await context.params
+  const session = await getServerSession(authOptions)
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
   }
@@ -43,7 +44,7 @@ export async function PATCH(
   }
 
   const updatedQuote = await prisma.requestQuote.update({
-    where: { id: params.id },
+    where: { id },
     data: {
       status: body.status,
     },

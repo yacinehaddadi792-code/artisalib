@@ -1,9 +1,10 @@
 import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
 
-export default async function ArtisanProfilePage({ params }: { params: { id: string } }) {
-  const artisan = await prisma.artisanProfile.findUnique({
-    where: { id: params.id },
+export default async function ArtisanPage({ params, }: { params: Promise<{id: string}> }) {
+  const { id } = await params 
+  const artisan = await prisma.artisanProfile.findUnique ({
+    where: { id },
     include: {
       user: true,
       reviews: {
@@ -13,7 +14,7 @@ export default async function ArtisanProfilePage({ params }: { params: { id: str
     },
   })
 
-  if (!artisan) return notFound()
+  if (!artisan) { notFound() }
 
   const contactUrl = `/client?trade=${encodeURIComponent(artisan.trade)}&city=${encodeURIComponent(artisan.city)}&artisan=${encodeURIComponent(artisan.businessName)}`
 

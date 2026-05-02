@@ -106,7 +106,7 @@ const status = artisan.subscriptionStatus || "INACTIVE"
 
 const isPaid =
   (plan === "BASIC" || plan === "PREMIUM") &&
-  (status === "ACTIVE" || status === "TRIAL")
+  (status === "ACTIVE" || status === "TRIALING")
 
 if (!isPaid) {
   const count = await prisma.requestQuote.count({
