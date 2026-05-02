@@ -2,12 +2,11 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/db"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-
 export async function PATCH(
-  request: Request,
+  request : Request,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions)
+  const { id } = await params
 
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
@@ -28,7 +27,7 @@ export async function PATCH(
   }
 
   const quote = await prisma.requestQuote.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       request: true,
       artisan: true,
