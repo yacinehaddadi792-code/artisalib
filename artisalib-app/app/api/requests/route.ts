@@ -20,6 +20,20 @@ export async function GET() {
 
   const requests = await prisma.request.findMany({
     where: { userId: user.id },
+    include: {
+      responses: {
+        include: {
+          artisan: true,
+        },
+        orderBy: { createdAt: "desc" },
+      },
+      requestQuotes: {
+        include: {
+          artisan: true,
+        },
+        orderBy: { createdAt: "desc" },
+      },
+    },
     orderBy: { createdAt: "desc" },
   })
 

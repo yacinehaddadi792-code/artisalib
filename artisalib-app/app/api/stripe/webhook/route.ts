@@ -1,46 +1,45 @@
-import { prisma } from '@/lib/db';
-import { stripe } from '@/lib/stripe';
-import Stripe from 'stripe';
+import Stripe from "stripe"
+import { NextResponse } from "next/server"
+import { prisma } from "@/lib/db"
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export async function POST(req: Request) {
-  const signature = req.headers.get('stripe-signature');
-  if (!signature) return new Response('Missing signature', { status: 400 });
+  const body = await req.text()
+  const signature = req.headers.get("stripe-signature")
 
-  const body = await req.text();
-  let event: Stripe.Event;
-
-  try {
-    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
-  } catch (error) {
-    return new Response(`Webhook error: ${(error as Error).message}`, { status: 400 });
+  if (!signature) {
+    return new NextResponse("Missing stripe signature", { status: 400 })
   }
 
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as Stripe.Checkout.Session;
-    const artisanId = session.metadata?.artisanId;
-    const plan = session.metadata?.plan as 'BASIC' | 'PREMIUM' | undefined;
-    if (artisanId && plan && session.subscription) {
+  let event: Stripe.Event
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET!
+    )
+  } catch {
+    return new NextResponse("Webhook signature error", { status: 400 })
+  }
+
+  if (event.type === "checkout.session.completed") {
+    const checkoutSession = event.data.object as Stripe.Checkout.Session
+
+    const artisanId = checkoutSession.metadata?.artisanId
+    const plan = checkoutSession.metadata?.plan
+
+    if (artisanId && plan) {
       await prisma.artisanProfile.update({
         where: { id: artisanId },
         data: {
-          stripeSubscriptionId: String(session.subscription),
           subscriptionPlan: plan,
-          subscriptionStatus: 'ACTIVE',
-          visible: true,
-          isPremium: plan === 'PREMIUM',
-          stripePriceId: session.metadata?.plan,
+          subscriptionStatus: "ACTIVE",
         },
-      });
+      })
     }
   }
 
-  if (event.type === 'customer.subscription.deleted') {
-    const subscription = event.data.object as Stripe.Subscription;
-    await prisma.artisanProfile.updateMany({
-      where: { stripeSubscriptionId: subscription.id },
-      data: { subscriptionStatus: 'CANCELED', visible: false, isPremium: false },
-    });
-  }
-
-  return new Response('ok');
+  return NextResponse.json({ received: true })
 }

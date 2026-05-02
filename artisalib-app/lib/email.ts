@@ -54,3 +54,51 @@ export async function sendVerificationEmail(email: string, link: string) {
 
   console.log("EMAIL SENT SUCCESS");
 }
+ 
+export async function sendNewQuoteEmail(email: string, amount: number, description: string) {
+  const apiKey = process.env.BREVO_API_KEY
+  const from = process.env.MAIL_FROM
+
+  if (!apiKey || !from) return
+
+  await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "api-key": apiKey,
+    },
+    body: JSON.stringify({
+      sender: { email: from, name: "Artisalib" },
+      to: [{ email }],
+      subject: "Nouveau devis reçu",
+      htmlContent: `
+        <h2>Vous avez reçu un devis</h2>
+        <p><strong>Montant :</strong> ${amount} €</p>
+        <p>${description}</p>
+      `,
+    }),
+  })
+}
+ export async function sendQuoteAcceptedEmail(email: string) {
+  const apiKey = process.env.BREVO_API_KEY
+  const from = process.env.MAIL_FROM
+
+  if (!apiKey || !from) return
+
+  await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "api-key": apiKey,
+    },
+    body: JSON.stringify({
+      sender: { email: from, name: "Artisalib" },
+      to: [{ email }],
+      subject: "Devis accepté 🎉",
+      htmlContent: `
+        <h2>Bonne nouvelle !</h2>
+        <p>Votre devis a été accepté par un client.</p>
+      `,
+    }),
+  })
+}
