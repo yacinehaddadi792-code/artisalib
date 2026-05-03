@@ -35,7 +35,8 @@ export async function sendVerificationEmail(email: string, link: string) {
             <p>Cliquez ci-dessous :</p>
 
             <a href="${link}" style="display:inline-block;padding:12px 20px;background:#000;color:#fff;text-decoration:none;border-radius:6px;">
-              Confirmer mon compte
+               target="_blank"
+               Confirmer mon compte
             </a>
 
             <p>Ou copie ce lien :</p>
@@ -64,8 +65,10 @@ export async function sendNewQuoteEmail(email: string, amount: number, descripti
   await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
     headers: {
+      'X-Mailin-Track': '0',
       "Content-Type": "application/json",
       "api-key": apiKey,
+      Accept: 'application/json',
     },
     body: JSON.stringify({
       sender: { email: from, name: "Artisalib" },
@@ -88,8 +91,10 @@ export async function sendNewQuoteEmail(email: string, amount: number, descripti
   await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
     headers: {
+      'X-Mailin-Track': '0',
       "Content-Type": "application/json",
       "api-key": apiKey,
+      Accept: 'application/json',
     },
     body: JSON.stringify({
       sender: { email: from, name: "Artisalib" },

@@ -51,8 +51,9 @@ export async function POST(request: Request) {
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
     },
   });
-
-  const verificationLink = `${process.env.APP_URL}/api/auth/verify-email?token=${token}`;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || "http://localhost:3000"
+ 
+  const verificationLink = `${baseUrl}/api/auth/verify-email?token=${token}`;
   
   await sendVerificationEmail(email, verificationLink);
 
