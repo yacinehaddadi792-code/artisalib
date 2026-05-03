@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 export default function SessionTimeout() {
   useEffect(() => {
-    let timer: NodeJS.Timeout;
+    let timer: ReturnType<typeof setTimeout>;
 
     const resetTimer = () => {
       clearTimeout(timer);
