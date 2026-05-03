@@ -23,16 +23,12 @@ export default function SessionTimeout() {
     window.addEventListener("mousemove", resetTimer);
     window.addEventListener("keydown", resetTimer);
     window.addEventListener("click", resetTimer);
-    window.addEventListener("scroll", resetTimer);
-    window.addEventListener("touchstart", resetTimer);
 
     return () => {
       clearTimeout(timer);
       window.removeEventListener("mousemove", resetTimer);
       window.removeEventListener("keydown", resetTimer);
       window.removeEventListener("click", resetTimer);
-      window.removeEventListener("scroll", resetTimer);
-      window.removeEventListener("touchstart", resetTimer);
     };
   }, [status]);
 
