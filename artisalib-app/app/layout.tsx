@@ -19,8 +19,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="fr" className={`${dmSans.variable} ${playfair.variable}`}>
       <body className="font-sans text-ink antialiased">
-        <Header user={user} />
-        <SessionTimeout />
+        <Header user={user} /> 
         {children}
       </body>
     </html>
