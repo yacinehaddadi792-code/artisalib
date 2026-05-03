@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { DM_Sans, Playfair_Display } from 'next/font/google';
 import { getCurrentUser } from '@/lib/auth';
 import { Header } from '@/components/header';
+import SessionTimeout from "@/components/session-timeout";
 
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
@@ -19,6 +20,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="fr" className={`${dmSans.variable} ${playfair.variable}`}>
       <body className="font-sans text-ink antialiased">
         <Header user={user} />
+        <SessionTimeout />
         {children}
       </body>
     </html>
