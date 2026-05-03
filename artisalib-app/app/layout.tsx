@@ -5,6 +5,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { Header } from '@/components/header';
 import Providers from "@/components/providers";
 import SessionTimeout from "@/components/session-timeout";
+import Footer from "@/components/footer";
 
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
@@ -24,6 +25,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
          <Header user={user} />
          <SessionTimeout />
          {children}
+         <Footer />
         </Providers>
       </body>
     </html>
