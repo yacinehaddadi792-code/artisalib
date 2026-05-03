@@ -25,21 +25,26 @@ export async function POST(request: Request) {
   const formData = await request.formData()
 
   const requestId = formData.get("requestId")?.toString()
-  const amount = formData.get("amount")?.toString()
+  const rawAmount = formData.get("amount")
+  const amountNumber = Number(rawAmount)
   const workDescription = formData.get("workDescription")?.toString()
   const estimatedDelay = formData.get("estimatedDelay")?.toString()
   const validUntil = formData.get("validUntil")?.toString()
   const message = formData.get("message")?.toString()
 
-  if (!requestId || !amount || !workDescription) {
+  if (!requestId || !rawAmount || !workDescription) {
     return NextResponse.json(
       { error: "Le montant et la description des travaux sont obligatoires." },
       { status: 400 }
     )
   }
+  if (Number.isNaN(amountNumber) || amountNumber <=0) {
+    return NextResponse.json(
+      { error: "Montant Invalide" },
+      { status: 400 } )
 
-  const clientRequest = await prisma.request.findUnique({
-    where: { id: requestId },
+  const clientRequest = await prisma.request.findFirst({
+    where: { id: requestId, },
     include: { user: true },
   })
 
@@ -62,11 +67,11 @@ export async function POST(request: Request) {
 
   const quote = await prisma.requestQuote.create({
     data: {
-      requestId,
-      clientId: clientRequest.userId,
+      requestId: requestId!,
+      clientId: clientRequest!.userId,
       artisanId: artisan.id,
-      amount,
-      workDescription,
+      amount: amountNumber.toString(),
+      workDescription: workDescription!,
       estimatedDelay: estimatedDelay || null,
       validUntil: validUntil || null,
       message: message || null,
@@ -75,17 +80,17 @@ export async function POST(request: Request) {
 
   await prisma.requestResponse.create({
     data: {
-      requestId,
+      requestId: requestId!,
       artisanId: artisan.id,
-      amount,
-      message: message || workDescription,
+      amount: amountNumber.toString(),
+      message: message || workDescription!,
     },
   })
 
   let conversation = await prisma.conversation.findFirst({
     where: {
-      requestId,
-      clientId: clientRequest.userId,
+      requestId: requestId!,
+      clientId: clientRequest!.userId,
       artisanId: artisan.id,
     },
   })
@@ -93,8 +98,8 @@ export async function POST(request: Request) {
   if (!conversation) {
     conversation = await prisma.conversation.create({
       data: {
-        requestId,
-        clientId: clientRequest.userId,
+        requestId: requestId!,
+        clientId: clientRequest!.userId,
         artisanId: artisan.id,
       },
     })
@@ -121,17 +126,12 @@ if (!isPaid) {
 }
   await prisma.message.create({
     data: {
-      conversationId: conversation.id,
+      conversationId: conversation!.id,
       senderRole: "ARTISAN",
       content: `📄 Devis envoyé
  
-await sendNewQuoteEmail(
-  clientRequest.user.email,
-  Number(amount),
-  message
-)
 
-Montant : ${amount} €
+Montant : ${amountNumber} €
 
 Travaux prévus :
 ${workDescription}
@@ -142,5 +142,11 @@ ${message ? `\nMessage : ${message}` : ""}`,
     },
   })
 
-  return NextResponse.redirect(new URL(`/chat/${conversation.id}`, request.url))
-}
+await sendNewQuoteEmail(
+  clientRequest!.user.email,
+  amountNumber,
+  message || ""
+)
+
+  return NextResponse.redirect(new URL(`/chat/${conversation!.id}`, request.url))
+} }
