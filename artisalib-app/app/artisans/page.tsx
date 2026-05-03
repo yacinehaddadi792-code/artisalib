@@ -1,10 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSearchParams } from "next/navigation"
 
 export default function ArtisansPage() {
-  const [trade, setTrade] = useState('')
-  const [city, setCity] = useState('')
+  const searchParams = useSearchParams()
+  const [trade, setTrade] = useState(searchParams.get("trade") || "")
+  const [city, setCity] = useState(searchParams.get("city") || "")
   const [artisans, setArtisans] = useState<any[]>([])
 
   async function searchArtisans() {
@@ -21,7 +23,7 @@ export default function ArtisansPage() {
 
   useEffect(() => {
     searchArtisans()
-  }, [])
+  }, [trade, city])
 
   return (
     <main style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px' }}>
