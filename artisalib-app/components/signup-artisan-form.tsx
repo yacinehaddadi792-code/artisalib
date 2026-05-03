@@ -3,8 +3,8 @@
 import { useMemo, useState } from 'react';
 
 const plans = {
-  BASIC: { label: 'Basic', price: '40€/mois HT' },
-  PREMIUM: { label: 'Premium', price: '90€/mois HT' },
+  BASIC: { label: 'Basic', price: '25.99€/mois HT' },
+  PREMIUM: { label: 'Premium', price: '45.95€/mois HT' },
 } as const;
 
 export function SignupArtisanForm({ defaultPlan = 'BASIC' }: { defaultPlan?: 'BASIC' | 'PREMIUM' }) {
@@ -62,8 +62,8 @@ export function SignupArtisanForm({ defaultPlan = 'BASIC' }: { defaultPlan?: 'BA
         <div>
           <label className="label">Abonnement</label>
           <select className="input" value={form.subscriptionPlan} onChange={(e) => setForm({ ...form, subscriptionPlan: e.target.value as 'BASIC' | 'PREMIUM' })}>
-            <option value="BASIC">Basic — 40€/mois HT</option>
-            <option value="PREMIUM">Premium — 90€/mois HT</option>
+            <option value="BASIC">Basic — 25.99€/mois HT</option>
+            <option value="PREMIUM">Premium — 45.95€/mois HT</option>
           </select>
         </div>
       </div>
