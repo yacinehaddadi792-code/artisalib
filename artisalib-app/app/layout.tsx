@@ -21,6 +21,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="fr" className={`${dmSans.variable} ${playfair.variable}`}>
       <body>
         <Providers>
+         <Header user={user} />
          <SessionTimeout />
          {children}
         </Providers>
