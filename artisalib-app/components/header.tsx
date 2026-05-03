@@ -20,7 +20,7 @@ export async function Header({ user }: { user: (User & { artisanProfile?: { slug
           ) : (
             <>
               <Link href="/login" className="btn-muted">Connexion</Link>
-              <Link href="/signup" className="btn-primary">Créer un Compte</Link>
+              <Link href="/register" className="btn-primary">Créer un Compte</Link>
             </>
           )}
         </nav>
