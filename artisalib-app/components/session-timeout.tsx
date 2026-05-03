@@ -1,10 +1,14 @@
 "use client";
 
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useEffect } from "react";
 
 export default function SessionTimeout() {
+  const { status } = useSession();
+
   useEffect(() => {
+    if (status !== "authenticated") return;
+
     let timer: ReturnType<typeof setTimeout>;
 
     const resetTimer = () => {
@@ -30,7 +34,7 @@ export default function SessionTimeout() {
       window.removeEventListener("scroll", resetTimer);
       window.removeEventListener("touchstart", resetTimer);
     };
-  }, []);
+  }, [status]);
 
   return null;
 }
